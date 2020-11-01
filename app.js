@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan'
 import mongoose from 'mongoose';
 import routes from './routes/index.route'
+const { validate, ValidationError, Joi } = require('express-validation');
 
 const app = express();
 
@@ -27,15 +28,30 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// app.use(function (err, req, res, next) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  // customize Joi validation errors
+  // if (err.isJoi) {
+  //   err.message = err.errors.map(e => e.messages).join("; ");
+  //   err.status = 400;
+  // }
+  if (err instanceof ValidationError) {
+    return res.status(err.statusCode).json(err)
+  }
+  return res.status(500).json({ message: err.message })
+  next(err);
 });
+
 
 const mongoUri = process.env.MONGO_HOST;
 mongoose.connect(mongoUri, { keepAlive: 1 });

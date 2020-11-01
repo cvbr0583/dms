@@ -1,9 +1,11 @@
 import express from 'express';
-import authCtrl from '../controllers/auth.controller';
 const router = express.Router();
+import authCtrl from '../controllers/auth.controller';
+import Joi from '../joi/auth.joi';
+const { validate } = require('express-validation')
 
 /* Login API */
-router.post('/login', authCtrl.login);
+router.post('/login', validate(Joi.login, { keyByField: true }), authCtrl.login);
 
 /* Logout API */
 router.post('/logout', authCtrl.logout);
