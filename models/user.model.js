@@ -35,8 +35,7 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   }
 }, {
-    versionKey: false
-  });
-
+  versionKey: false
+});
 
 module.exports = mongoose.model('User', UserSchema);
